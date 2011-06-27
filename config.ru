@@ -1,3 +1,3 @@
-require './index'
+require './main'
 
 run Sinatra::Application
