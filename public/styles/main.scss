@@ -1,0 +1,29 @@
+@mixin terminal-font {
+    color: #ffffff;
+    font-family: monospace;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+body {
+    @include terminal-font;
+    background-color: black;
+    width: 100%;
+}
+
+input {
+    @include terminal-font;
+    background-color: black;
+    border: none;
+    outline: none;
+}
+
+#console_input {
+    width: 100%;
+    @include terminal-font;
+}
+
+#console {
+    width: 100%;
+    @include terminal-font;
+}

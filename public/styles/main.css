@@ -1,0 +1,30 @@
+body {
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  background-color: black;
+  width: 100%; }
+
+input {
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  background-color: black;
+  border: none;
+  outline: none; }
+
+#console_input {
+  width: 100%;
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.5; }
+
+#console {
+  width: 100%;
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.5; }
