@@ -2,7 +2,7 @@
 // It was mentioned in this stack overflow question:
 // http://stackoverflow.com/questions/512528/set-cursor-position-in-html-textbox
 
-function doGetCaretPosition (ctrl) {
+function getCaretPosition (ctrl) {
   var CaretPos = 0;
   // IE Support
   if (document.selection) {
