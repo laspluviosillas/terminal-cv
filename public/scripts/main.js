@@ -1,99 +1,119 @@
-// These two variables will be for up/down scrolling through
-// commands. Terminal style, baby 8-)
-var command_history = new Array();
-var command_history_pointer = 0;
-var user = 'guest@sam-cv:/$ ';
+/* DO NOT MODIFY. This file was compiled Thu, 30 Jun 2011 17:04:49 GMT from
+ * /Users/jstrong/webapps/sam-terminal/public/coffeescripts/main.coffee
+ */
 
-function scrollToBottom() {
-    $(window).scrollTop($(document).height());
-}
-
-function executeCommand(command, args) {
-    $('#console').append($('#console_input').val() + '<br />');
-    $('#console_input').val(user);
-    // If the command is null or empty, return.
-    if (command == '' || command == null) return;
-    $.get('run/' + command, 'args=' + args, function(command_output) {
-        // nl2br on the command output
-        command_output = command_output.replace(/\n/g, '<br />');
-
-        // append command output to screen
-        $('#console').append(command_output + "<br />");
-        scrollToBottom();
-    });
-}
-
-$(document).ready(function() {
-    $('#console_input').bind('keyup', function(e) {
-        // If the enter key is pressed (keycode 13)
-        if (e.keyCode == 13) {
-            var input = $('#console_input').val().substring(user.length);
-
-            // Add the command to the navigable command history
-            command_history.push(input);
-
-            // split the command into command and args
-            var command = input.replace(/^(\w+).*/, '$1');
-            var args = input.substring(command.length);
-
-            // execute the command
-            executeCommand(command, args);
-
-            // set the command history pointer to the most recent command.
-            command_history_pointer = command_history.length;
+(function() {
+  var Console, DOWN, ENTER, InputController, UP;
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  ENTER = 13;
+  DOWN = 40;
+  UP = 38;
+  Console = (function() {
+    function Console() {}
+    Console.view = null;
+    Console.input = null;
+    Console.user = 'guest@sam-cv:/$ ';
+    Console.command_history = [];
+    Console.command_history_pointer = 0;
+    Console.execute_command = function(command, args) {
+      this.view.append(this.input.command() + '<br />');
+      this.input.set_command(this.user);
+      if (command === '' || command === null) {
+        return;
+      }
+      return $.get('run/' + command, 'args=' + args, __bind(function(command_output) {
+        var command_ouput;
+        command_ouput = command_output.replace(/\n/g, '<br />');
+        this.view.append(command_output + "<br />");
+        return this.scrollToBottom();
+      }, this));
+    };
+    Console.add_history = function(input) {
+      return this.command_history.push(input);
+    };
+    Console.scrollToBottom = function() {
+      return $(window).scrollTop($(document).height());
+    };
+    return Console;
+  })();
+  InputController = (function() {
+    InputController.prototype.view = null;
+    function InputController(view) {
+      this.view = view;
+      this.create_bindings();
+    }
+    InputController.prototype.create_bindings = function() {
+      this.view.bind('keyup', __bind(function(e) {
+        if (e.keyCode === ENTER) {
+          return this.enter(e);
         }
-
-        // stop the event from bubbling up
+      }, this));
+      return this.view.bind('keydown', __bind(function(e) {
+        if (e.keyCode === DOWN) {
+          return this.down(e);
+        }
+        if (e.keyCode === UP) {
+          return this.up(e);
+        }
+        return this.reset_caret_position(e);
+      }, this));
+    };
+    InputController.prototype.reset_caret_position = function(e) {
+      var caret_position;
+      caret_position = this.caret_position();
+      if (e.keyCode === 8 || e.keyCode === 46 || e.keyCode === 37) {
+        caret_position -= 1;
+      }
+      if (caret_position < Console.user.length) {
         return false;
-    });
-
-    $('#console_input').bind('keydown', function(e) {
-        if (e.keyCode == 40) {
-            // keyboard down
-            if (command_history_pointer + 1 < command_history.length) {
-                command_history_pointer += 1;
-                $('#console_input').val(user + command_history[command_history_pointer]);
-            } else {
-                $('#console_input').val(user);
-            }
-
-            // stop the event bubbling
-            return false;
-        } else if (e.keyCode == 38) {
-            // keyboard up
-            if (command_history_pointer > 0) {
-                command_history_pointer -= 1;
-                $('#console_input').val(user + command_history[command_history_pointer]);
-
-                // the caret jumps to the start when the up key is pressed,
-                // this moves it back to the end.
-                var length = $('#console_input').val().length;
-                setCaretPosition(document.getElementById('console_input'), length);
-            }
-
-            // stop the event bubbling
-            return false;
-        } else {
-            // This code ensures that nothing happens to the user text at
-            // the start of each command.
-            var caret_position = getCaretPosition(document.getElementById('console_input'));
-            // Compensate for when the character pressed is either delete,
-            // backspace or left.
-            if (e.keyCode == 8 || e.keyCode == 46 || e.keyCode == 37) {
-                caret_position -= 1;
-            }
-            if (caret_position < user.length) {
-                return false;
-            }
-        }
-    });
-
-    // To make the text box easier to find, focus it wherever you click.
+      }
+    };
+    InputController.prototype.enter = function(e) {
+      var args, command, input;
+      input = this.view.val().substring(Console.user.length);
+      Console.add_history(input);
+      command = input.replace(/^(\w+).*/, '$1');
+      args = input.substring(command.length);
+      Console.execute_command(command, args);
+      return Console.command_history_pointer = Console.command_history.length;
+    };
+    InputController.prototype.up = function(e) {
+      var length;
+      if (Console.command_history_pointer > 0) {
+        Console.command_history_pointer -= 1;
+        this.view.val(user + Console.command_history[Console.command_history_pointer]);
+        length = this.view.val().length;
+        setCaretPosition(document.getElementById('console_input'), length);
+      }
+      return false;
+    };
+    InputController.prototype.down = function(e) {
+      if (Console.command_history_pointer + 1 < Console.command_history.length) {
+        Console.command_history_pointer += 1;
+        this.view.val(user + Console.command_history[Console.command_history_pointer]);
+      } else {
+        this.view.val(user);
+      }
+      return false;
+    };
+    InputController.prototype.set_command = function(command) {
+      return this.view.val(command);
+    };
+    InputController.prototype.command = function() {
+      return this.view.val();
+    };
+    InputController.prototype.caret_position = function() {
+      return getCaretPosition(document.getElementById('console_input'));
+    };
+    return InputController;
+  })();
+  $(document).ready(function() {
+    Console.view = $('#console');
+    Console.input = new InputController($('#console_input'));
     $(document).bind('click', function(e) {
-        $('#console_input').focus();
+      return $('#console_input').focus();
     });
-
-    $('#console_input').val(user);
-    // give focus to the input
-    $('#console_input').focus();
-});
+    $('#console_input').val(Console.user);
+    return $('#console_input').focus();
+  });
+}).call(this);
