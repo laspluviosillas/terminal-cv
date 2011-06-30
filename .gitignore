@@ -1,2 +1,6 @@
 .rvmrc
 .sass-cache/**/*
+
+.DS_Store
+
+.gitignore
